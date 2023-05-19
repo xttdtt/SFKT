@@ -164,12 +164,13 @@ with tf.Session() as sess:
         train_loss /= train_steps
         epochendtime = time.time()
         logging.info("epoch %d, loss %f, time %f" % (i + 1, train_loss, epochendtime - epochstarttime))
+        train_loss = round(train_loss, 4)
         if train_loss < best_loss:
             best_loss = train_loss
             Loss.clear()
-            Loss.append(round(train_loss,4))
+            Loss.append(train_loss)
         else:
-            Loss.append(round(train_loss,4))
+            Loss.append(train_loss)
         if len(Loss) == early_stop:
             logging.info("Early stop at %d based on loss result." % (i + 1))
             break
