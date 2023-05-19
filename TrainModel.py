@@ -9,8 +9,6 @@ import numpy as np
 from sklearn import metrics
 from HyperParameter import *
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
-
 starttime = time.time()
 datafolder = os.path.join(dataset, "Data")
 modelfolder = os.path.join(dataset, 'Model')
@@ -43,7 +41,7 @@ tf_keep_rate = tf.placeholder(tf.float32, None, name="tf_keep_rate")
 tf_tmp_corr_target = tf.reshape(tf_corr_target, [-1, 1])
 tf_tmp_corr_target = tf.tile(tf_tmp_corr_target, [1, 1 + max_skill_len])
 
-pred_stu_study = tf.get_variable('pred_stu_study', [num_stu, 1 + max_skill_len], initializer=tf.truncated_normal_initializer(stddev=0.1))
+pred_stu_study = tf.get_variable('pred_stu_study', [num_stu, 1], initializer=tf.truncated_normal_initializer(stddev=0.1))
 tf_stu_study = tf.nn.embedding_lookup(pred_stu_study, tf_stu_id)
 pred_stu_forget_ratio = tf.get_variable('pred_stu_forget_ratio', [num_stu, 1], initializer=tf.truncated_normal_initializer(stddev=0.1))
 tf_stu_forget_ratio = tf.nn.embedding_lookup(pred_stu_forget_ratio, tf_stu_id)
@@ -62,6 +60,7 @@ loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=tf_corr_lab
 optimizer = tf.train.AdamOptimizer(learning_rate=lr)
 train_op = optimizer.minimize(loss)
 
+saver = tf.train.Saver()
 logfile = os.path.join(modelfolder, "trainModel.txt")
 f = open(logfile, "wb+")
 f.truncate()
@@ -80,7 +79,7 @@ logging.info("begin training....")
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     best_auc = best_acc = 0
-    tmp, Loss = 0, np.zeros(epochs)
+    best_loss, Loss = np.inf, []
     for i in range(epochs):
         epochstarttime = time.time()
         train_loss = 0
@@ -113,16 +112,21 @@ with tf.Session() as sess:
         records = 'Epoch %d/%d, train loss:%.4f, test acc:%.4f, test auc:%.4f, epoch time:%f' % \
                   (i + 1, epochs, train_loss, test_acc, test_auc, epochendtime - epochstarttime)
         logging.info(records)
-        if best_acc + best_auc <= test_acc + test_auc:
-            best_acc = test_acc
-            best_auc = test_auc
-        Loss[i] = round(train_loss, 4)
-        if i >= early_stop:
-            if all(x <= y for x, y in zip(Loss[tmp:tmp + early_stop], Loss[tmp + 1:tmp + 1 + early_stop])):
-                logging.info("Early stop at %d based on loss result." % (i + 1))
-                break
-            tmp += 1
+        if train_loss < best_loss:
+            best_loss = train_loss
+            Loss.clear()
+            Loss.append(train_loss)
+            if best_acc + best_auc <= test_acc + test_auc:
+                best_acc = test_acc
+                best_auc = test_auc
+        else:
+            Loss.append(train_loss)
+        if len(Loss) == early_stop:
+            logging.info("Early stop at %d based on loss result." % (i + 1))
+            break
     logging.info("best acc:%.4f   best auc:%.4f" % (best_acc, best_auc))
+    saver.save(sess, modelfolder + "/trainModel.ckpt")
+    logging.info("total number of parameters in TrainModel process is %d" % calculate_parameter("trainModel"))
 
 endTraintime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 logging.info(os.linesep + '-' * 45 + ' END: ' + endTraintime + ' ' + '-' * 45)
