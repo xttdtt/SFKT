@@ -10,9 +10,6 @@ import math
 from scipy import sparse
 from HyperParameter import *
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-
-
 def cosine_similarity(num1, num2):
     num1 = tf.cast(num1, tf.float32)
     num2 = tf.transpose(tf.cast(num2, tf.float32))
