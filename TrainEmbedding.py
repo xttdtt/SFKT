@@ -197,4 +197,4 @@ endTraintime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 logging.info(os.linesep + '-' * 45 + ' END: ' + endTraintime + ' ' + '-' * 45)
 
 endtime = time.time()
-logging.info("total time %f" % (endtime - starttime))
+logging.info("total time %d" % (int(endtime - starttime) + 1))
