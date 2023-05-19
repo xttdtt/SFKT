@@ -167,9 +167,9 @@ with tf.Session() as sess:
         if train_loss < best_loss:
             best_loss = train_loss
             Loss.clear()
-            Loss.append(train_loss)
+            Loss.append(round(train_loss,4))
         else:
-            Loss.append(train_loss)
+            Loss.append(round(train_loss,4))
         if len(Loss) == early_stop:
             logging.info("Early stop at %d based on loss result." % (i + 1))
             break
