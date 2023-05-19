@@ -10,6 +10,7 @@ import math
 from scipy import sparse
 from HyperParameter import *
 
+
 def cosine_similarity(num1, num2):
     num1 = tf.cast(num1, tf.float32)
     num2 = tf.transpose(tf.cast(num2, tf.float32))
@@ -122,9 +123,11 @@ loss = mse_pro_skill + mse_pro_pro + mse_skill_skill + mse_pro_diff + mse_skill_
 optimizer = tf.train.AdamOptimizer(learning_rate=lr)
 train_op = optimizer.minimize(loss)
 
+# set the model save location
+saver = tf.train.Saver()
 # set log file to store the running results
 logfile = os.path.join(modelfolder, "trainEmbedding.txt")
-# clear log file content before each run
+# delete log file content before each run
 f = open(logfile, "wb+")
 f.truncate()
 logging.basicConfig(filename=logfile, level="DEBUG")
@@ -139,7 +142,7 @@ train_steps = int(math.ceil(num_pro / float(bs)))
 logging.info("begin training....")
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    best_loss, tmp, Loss = np.inf, 0, np.zeros(epochs)
+    best_loss, Loss = np.inf, []
     for i in range(epochs):
         epochstarttime = time.time()
         train_loss = 0
@@ -161,13 +164,18 @@ with tf.Session() as sess:
         train_loss /= train_steps
         epochendtime = time.time()
         logging.info("epoch %d, loss %f, time %f" % (i + 1, train_loss, epochendtime - epochstarttime))
-        Loss[i] = train_loss
-        if i >= early_stop:
-            if all(x <= y for x, y in zip(Loss[tmp:tmp + early_stop], Loss[tmp + 1:tmp + 1 + early_stop])):
-                logging.info("Early stop at %d based on loss result." % (i + 1))
-                break
-            tmp += 1
+        if train_loss < best_loss:
+            best_loss = train_loss
+            Loss.clear()
+            Loss.append(train_loss)
+        else:
+            Loss.append(train_loss)
+        if len(Loss) == early_stop:
+            logging.info("Early stop at %d based on loss result." % (i + 1))
+            break
     logging.info('finish training...')
+    saver.save(sess, modelfolder + "/trainEmbedding.ckpt")
+    logging.info("total number of parameters in TrainEmbedding process is %d" % calculate_parameter("trainEmbedding"))
 
     final_pro_pro_embed = tf.convert_to_tensor(tf.multiply(pro_embedding_matrix, pro_diff_embedding_matrix))
     final_pro_pro_embed = final_pro_pro_embed.eval()
