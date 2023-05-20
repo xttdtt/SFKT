@@ -176,7 +176,6 @@ with tf.Session() as sess:
             break
     logging.info('finish training...')
     saver.save(sess, modelfolder + "/trainEmbedding.ckpt")
-    logging.info("total number of parameters in TrainEmbedding process is %d" % calculate_parameter("trainEmbedding"))
 
     final_pro_pro_embed = tf.convert_to_tensor(tf.multiply(pro_embedding_matrix, pro_diff_embedding_matrix))
     final_pro_pro_embed = final_pro_pro_embed.eval()
