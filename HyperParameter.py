@@ -4,16 +4,18 @@ import tensorflow as tf
 
 # calculate the total number of parameters
 def calculate_parameter(savefile):
-    modelfolder = os.path.join(dataset, 'Model')
-    tf.train.import_meta_graph(modelfolder + '/' + savefile + '.ckpt.meta')
-    variables = tf.trainable_variables()
+    checkpoint_path = os.path.join(dataset, 'Model') + '/' + savefile + '.ckpt'
+    model_reader = tf.train.NewCheckpointReader(checkpoint_path)
+    para_dict = model_reader.get_variable_to_shape_map()
     total_parameters = 0
-    for variable in variables:
-        shape = variable.get_shape()
-        variable_parameters = 1
+    for key in para_dict:
+        shape = list(np.shape(model_reader.get_tensor(key)))
+        # print("variable name: ", key)
+        # print(model_reader.get_tensor(key))
+        parameters = 1
         for dim in shape:
-            variable_parameters *= dim.value
-        total_parameters += variable_parameters
+            parameters *= dim
+        total_parameters += parameters
     return total_parameters
 
 
@@ -35,7 +37,7 @@ When performing ablation experiments, you can modify the values here
 """
 # this program only supports two datasets:Assist09 and Assist12
 dataset = "Assist09"
-# learning rate
+# learning rate:0.001 0.005 0.01
 lr = 0.01
-# dimensions of embedding matrix
-embed_dim = 512
+# dimensions of embedding matrix：128  256  512
+embed_dim = 128
