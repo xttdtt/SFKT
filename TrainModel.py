@@ -127,7 +127,7 @@ with tf.Session() as sess:
             break
     logging.info("best acc:%.4f   best auc:%.4f" % (best_acc, best_auc))
     saver.save(sess, modelfolder + "/trainModel.ckpt")
-    logging.info("total number of parameters in TrainModel process is %d" % calculate_parameter("trainModel"))
+    logging.info("total number of parameters in whole process is %d" % (calculate_parameter("trainEmbedding") + calculate_parameter("trainModel")))
 
 endTraintime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 logging.info(os.linesep + '-' * 45 + ' END: ' + endTraintime + ' ' + '-' * 45)
