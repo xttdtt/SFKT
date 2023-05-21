@@ -4,7 +4,7 @@ import tensorflow as tf
 
 # calculate the total number of parameters
 def calculate_parameter(savefile):
-        checkpoint_path = os.path.join(dataset, 'Model') + '/' + savefile + '.ckpt'
+    checkpoint_path = os.path.join(dataset, 'Model') + '/' + savefile + '.ckpt'
     model_reader = tf.train.NewCheckpointReader(checkpoint_path)
     para_dict = model_reader.get_variable_to_shape_map()
     total_parameters = 0
