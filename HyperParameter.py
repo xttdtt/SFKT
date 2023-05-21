@@ -40,7 +40,7 @@ When performing ablation experiments, you can modify the values here
 """
 # this program only supports two datasets:Assist09 and Assist12
 dataset = "Assist09"
-# learning rate:0.001 0.005 0.01
+# learning rate
 lr = 0.01
-# dimensions of embedding matrix：128  256  512
+# dimensions of embedding matrix
 embed_dim = 128
