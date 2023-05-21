@@ -4,18 +4,18 @@ import tensorflow as tf
 
 # calculate the total number of parameters
 def calculate_parameter(savefile):
-    checkpoint_path = os.path.join(dataset, 'Model') + '/' + savefile + '.ckpt'
+        checkpoint_path = os.path.join(dataset, 'Model') + '/' + savefile + '.ckpt'
     model_reader = tf.train.NewCheckpointReader(checkpoint_path)
     para_dict = model_reader.get_variable_to_shape_map()
     total_parameters = 0
     for key in para_dict:
         key_shape = np.shape(model_reader.get_tensor(key))
-        shape = list(key_shape)
+        total_shape = list(key_shape)
         # print("variable name: ", key)
         # print("variable shape: ", key_shape)
         # print(model_reader.get_tensor(key))
         parameters = 1
-        for dim in shape:
+        for dim in total_shape:
             parameters *= dim
         total_parameters += parameters
     return total_parameters
