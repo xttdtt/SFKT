@@ -9,8 +9,10 @@ def calculate_parameter(savefile):
     para_dict = model_reader.get_variable_to_shape_map()
     total_parameters = 0
     for key in para_dict:
-        shape = list(np.shape(model_reader.get_tensor(key)))
+        key_shape = np.shape(model_reader.get_tensor(key))
+        shape = list(key_shape)
         # print("variable name: ", key)
+        # print("variable shape: ", key_shape)
         # print(model_reader.get_tensor(key))
         parameters = 1
         for dim in shape:
