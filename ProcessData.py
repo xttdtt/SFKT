@@ -221,8 +221,8 @@ def extract_stu_skill(dataset, datafolder, df):
                         stu_skill_total_adj[tmp_stu_id][skill_id_dict[skill]] += 1
             else:
                 if tmp_df[tmp_df.index == line]["correct"].values == 1:
-                    skill_corr_count[skill_id_dict[skill]] += 1
-                    skill_corr_time[skill_id_dict[skill]] += tmp_df[tmp_df.index == line]["ms_first_response"].values
+                    skill_corr_count[skill_id_dict[tmp_skills]] += 1
+                    skill_corr_time[skill_id_dict[tmp_skills]] += tmp_df[tmp_df.index == line]["ms_first_response"].values
                     stu_skill_corr_adj[tmp_stu_id][skill_id_dict[tmp_skills]] += 1
                     stu_skill_total_adj[tmp_stu_id][skill_id_dict[tmp_skills]] += 1
                 else:
