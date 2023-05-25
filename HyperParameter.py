@@ -2,7 +2,6 @@ import os
 import tensorflow as tf
 import numpy as np
 
-
 # calculate the total number of parameters
 def calculate_parameter(savefile):
     checkpoint_path = os.path.join(dataset, 'Model') + '/' + savefile + '.ckpt'
